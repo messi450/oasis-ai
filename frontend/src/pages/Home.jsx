@@ -109,33 +109,49 @@ export default function Home() {
     setMessages(updatedMessages);
     setIsLoading(true);
 
-    // Generate recommendation from Backend
     try {
-      const data = await ChatService.analyzePrompt(text);
-      const recommendation = data.recommendation;
+      if (activeModel) {
+        // Chat Mode
+        const data = await ChatService.chat(text, activeModel.name, messages);
 
-      const aiMessage = {
-        id: Date.now() + 1,
-        type: 'ai',
-        content: recommendation.reasoning, // Use reasoning as the message content
-        timestamp: getCurrentTime(),
-        recommendation: recommendation,
-        role: 'ai',
-        requestId: data.request_id
-      };
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          content: data.response,
+          timestamp: getCurrentTime(),
+          role: 'ai',
+          model: activeModel.name
+        };
 
-      const finalMessages = [...updatedMessages, aiMessage];
-      setMessages(finalMessages);
+        const finalMessages = [...updatedMessages, aiMessage];
+        setMessages(finalMessages);
+        saveChat(finalMessages);
 
-      // Save chat to database (local history)
-      saveChat(finalMessages);
+      } else {
+        // Analysis Mode
+        const data = await ChatService.analyzePrompt(text);
+        const recommendation = data.recommendation;
+
+        const aiMessage = {
+          id: Date.now() + 1,
+          type: 'ai',
+          content: recommendation.reasoning,
+          timestamp: getCurrentTime(),
+          recommendation: recommendation,
+          role: 'ai',
+          requestId: data.request_id
+        };
+
+        const finalMessages = [...updatedMessages, aiMessage];
+        setMessages(finalMessages);
+        saveChat(finalMessages);
+      }
     } catch (error) {
-      console.error('Failed to get recommendation:', error);
-      // Add error message
+      console.error('Failed to process message:', error);
       const errorMessage = {
         id: Date.now() + 1,
         type: 'ai',
-        content: 'Sorry, I encountered an error while analyzing your request. Please try again.',
+        content: 'Sorry, I encountered an error. Please check your connection or API key.',
         timestamp: getCurrentTime(),
         role: 'ai'
       };

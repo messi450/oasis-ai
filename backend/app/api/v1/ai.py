@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.models.base import get_db
-from app.schemas.ai import AnalyzePromptRequest, AnalyzePromptResponse
+from app.schemas.ai import AnalyzePromptRequest, AnalyzePromptResponse, ChatRequest, ChatResponse
 from app.services.ai_service import AIService
 from app.repositories.ai_logs_repo import AILogsRepository
 import time
@@ -47,6 +47,26 @@ async def analyze_prompt(
         recommendation=recommendation,
         request_id=ai_request.id
     )
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat(
+    request: ChatRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Chat with a specific AI model.
+    """
+    response_text = AIService.chat_with_model(
+        message=request.message,
+        model_name=request.model_name,
+        history=request.history
+    )
+    
+    # Log usage (simplified for now)
+    # real impl would track tokens, etc.
+    
+    return ChatResponse(response=response_text)
+
 @router.get("/usage")
 async def get_usage_stats(
     skip: int = 0,

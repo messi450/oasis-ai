@@ -21,6 +21,15 @@ export const ChatService = {
         return response.data;
     },
 
+    chat: async (message, modelName, history = []) => {
+        const response = await apiClient.post('/ai/chat', {
+            message,
+            model_name: modelName,
+            history
+        });
+        return response.data;
+    },
+
     submitFeedback: async (feedbackData) => {
         const response = await apiClient.post('/feedback/feedback', feedbackData);
         return response.data;

@@ -10,18 +10,18 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     
     # Security
-    SECRET_KEY: str
+    SECRET_KEY: str = "dev-secret-key-change-in-prod"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # Database
-    DATABASE_URL: str
+    DATABASE_URL: str = "sqlite:///./oasis.db"
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:5173"]
+    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
     
     # AI Services
     OPENAI_API_KEY: str = ""
@@ -33,8 +33,14 @@ class Settings(BaseSettings):
     ENABLE_TRACING: bool = False
     
     class Config:
-        env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
+
+from dotenv import load_dotenv
+import os
+
+# Load .env file (system env vars take precedence)
+load_dotenv(override=False)
 
 settings = Settings()
