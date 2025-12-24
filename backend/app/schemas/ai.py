@@ -1,0 +1,22 @@
+from pydantic import BaseModel
+from typing import List, Optional
+
+
+class AnalyzePromptRequest(BaseModel):
+    prompt: str
+    user_id: Optional[int] = None
+
+
+class ModelRecommendation(BaseModel):
+    name: str
+    provider: str
+    reasoning: str
+    input_price: float
+    output_price: float
+    speed: str
+    categories: List[str]
+
+
+class AnalyzePromptResponse(BaseModel):
+    recommendation: ModelRecommendation
+    request_id: int
