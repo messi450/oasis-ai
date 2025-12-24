@@ -51,7 +51,7 @@ class AIService:
         return f"[{model_name}] Chat unavailable - no API key configured."
 
     @staticmethod
-    def analyze_prompt(prompt: str) -> ModelRecommendation:
+    def analyze_prompt(prompt: str) -> dict:
         """Analyze using Gemini (best for structured JSON)"""
         
         # Try Gemini first (better at structured output)
@@ -60,24 +60,30 @@ class AIService:
                 AIService._init_gemini()
                 model = genai.GenerativeModel('gemini-pro')
                 
-                system_prompt = """You are an AI model expert. Recommend ONE best model for the user's task.
+                system_prompt = """You are an AI model expert. Recommend the BEST model and an ALTERNATIVE model for the user's task.
+You are NOT limited to specific models. Recommend the absolute best tool for the job (e.g. Midjourney for images, Leonardo.ai for art, etc).
 
 Return ONLY valid JSON (no markdown):
 {
-    "name": "Model Name",
-    "provider": "Provider",
-    "reasoning": "One sentence why (under 15 words)",
-    "input_price": 2.5,
-    "output_price": 10.0,
-    "speed": "Fast",
-    "categories": ["Category1", "Category2"]
-}
-
-Models:
-- OpenAI o3: Best for code/debugging
-- Claude 3.5 Sonnet: Best for writing/content
-- Gemini 1.5 Pro: Best for data/research
-- GPT-4o: Best for general tasks"""
+    "main": {
+        "name": "Model Name",
+        "provider": "Provider",
+        "reasoning": "Why it is the best choice (under 15 words)",
+        "input_price": 0.0,
+        "output_price": 0.0,
+        "speed": "Fast",
+        "categories": ["Cat1"]
+    },
+    "alternative": {
+        "name": "Model Name",
+        "provider": "Provider",
+        "reasoning": "Why this is a good alternative (under 15 words)",
+        "input_price": 0.0,
+        "output_price": 0.0,
+        "speed": "Fast",
+        "categories": ["Cat1"]
+    }
+}"""
 
                 response = model.generate_content(f"{system_prompt}\n\nTask: {prompt}")
                 text = response.text.strip()
@@ -91,7 +97,10 @@ Models:
                     text = text[:-3]
                     
                 data = json.loads(text.strip())
-                return ModelRecommendation(**data)
+                return {
+                    "recommendation": ModelRecommendation(**data['main']),
+                    "alternative": ModelRecommendation(**data['alternative'])
+                }
                 
             except Exception as e:
                 logger.error(f"Gemini Analysis failed: {str(e)}", exc_info=True)
@@ -102,10 +111,11 @@ Models:
             try:
                 AIService._init_groq()
                 
-                system_prompt = """Recommend ONE best AI model. Return ONLY JSON:
-{"name": "Model", "provider": "Provider", "reasoning": "Short reason", "input_price": 2.5, "output_price": 10.0, "speed": "Fast", "categories": ["Cat1", "Cat2"]}
-
-Models: OpenAI o3 (code), Claude 3.5 Sonnet (writing), Gemini 1.5 Pro (data), GPT-4o (general)"""
+                system_prompt = """Recommend TWO models (Best and Alternative). Return ONLY JSON:
+{
+    "main": {"name": "M1", "provider": "P1", "reasoning": "R1", "input_price": 0, "output_price": 0, "speed": "Fast", "categories": ["C1"]},
+    "alternative": {"name": "M2", "provider": "P2", "reasoning": "R2", "input_price": 0, "output_price": 0, "speed": "Fast", "categories": ["C1"]}
+}"""
                 
                 response = AIService._groq_client.chat.completions.create(
                     model="llama-3.1-8b-instant",
@@ -114,7 +124,7 @@ Models: OpenAI o3 (code), Claude 3.5 Sonnet (writing), Gemini 1.5 Pro (data), GP
                         {"role": "user", "content": f"Task: {prompt}"}
                     ],
                     temperature=0.3,
-                    max_tokens=256
+                    max_tokens=512
                 )
                 
                 text = response.choices[0].message.content.strip()
@@ -126,7 +136,10 @@ Models: OpenAI o3 (code), Claude 3.5 Sonnet (writing), Gemini 1.5 Pro (data), GP
                     text = text[:-3]
                     
                 data = json.loads(text.strip())
-                return ModelRecommendation(**data)
+                return {
+                    "recommendation": ModelRecommendation(**data['main']),
+                    "alternative": ModelRecommendation(**data['alternative'])
+                }
                 
             except Exception as e:
                 logger.error(f"Groq Analysis failed: {str(e)}", exc_info=True)
@@ -134,45 +147,61 @@ Models: OpenAI o3 (code), Claude 3.5 Sonnet (writing), Gemini 1.5 Pro (data), GP
         # Fallback to keyword matching
         prompt_lower = prompt.lower()
         
+        main_rec = None
+        alt_rec = None
+        
         if any(word in prompt_lower for word in ["code", "debug", "programming", "function", "bug"]):
-            return ModelRecommendation(
-                name="OpenAI o3",
-                provider="OpenAI",
-                reasoning="Top coding AI with exceptional debugging.",
-                input_price=2.00,
-                output_price=8.00,
-                speed="Fast",
-                categories=["Code", "Auto"]
+            main_rec = ModelRecommendation(
+                name="OpenAI o3", provider="OpenAI", reasoning="Top coding AI with exceptional debugging.",
+                input_price=2.00, output_price=8.00, speed="Fast", categories=["Code", "Auto"]
+            )
+            alt_rec = ModelRecommendation(
+                name="GitHub Copilot", provider="GitHub", reasoning="Excellent IDE integration for coding.",
+                input_price=0.00, output_price=0.00, speed="Fast", categories=["Code", "Assistant"]
             )
         
-        if any(word in prompt_lower for word in ["write", "blog", "content", "article", "essay"]):
-            return ModelRecommendation(
-                name="Claude 3.5 Sonnet",
-                provider="Anthropic",
-                reasoning="Best writing quality and natural prose.",
-                input_price=3.00,
-                output_price=15.00,
-                speed="Fast",
-                categories=["Writing", "Creative"]
+        elif any(word in prompt_lower for word in ["write", "blog", "content", "article", "essay"]):
+            main_rec = ModelRecommendation(
+                name="Claude 3.5 Sonnet", provider="Anthropic", reasoning="Best writing quality and natural prose.",
+                input_price=3.00, output_price=15.00, speed="Fast", categories=["Writing", "Creative"]
+            )
+            alt_rec = ModelRecommendation(
+                name="ChatGPT-4o", provider="OpenAI", reasoning="Versatile and widely available.",
+                input_price=2.50, output_price=10.00, speed="Fast", categories=["Writing", "General"]
+            )
+            
+        elif any(word in prompt_lower for word in ["data", "analyze", "analysis", "statistics", "chart"]):
+            main_rec = ModelRecommendation(
+                name="Gemini 1.5 Pro", provider="Google", reasoning="Best for data with 1M token context.",
+                input_price=1.25, output_price=5.00, speed="Fast", categories=["Data", "Analysis"]
+            )
+            alt_rec = ModelRecommendation(
+                name="Claude 3 Opus", provider="Anthropic", reasoning="High reasoning for complex analysis.",
+                input_price=15.00, output_price=75.00, speed="Slow", categories=["Data", "Reasoning"]
             )
         
-        if any(word in prompt_lower for word in ["data", "analyze", "analysis", "statistics", "chart"]):
-            return ModelRecommendation(
-                name="Gemini 1.5 Pro",
-                provider="Google",
-                reasoning="Best for data with 1M token context.",
-                input_price=1.25,
-                output_price=5.00,
-                speed="Fast",
-                categories=["Data", "Analysis"]
+        if any(word in prompt_lower for word in ["image", "art", "photo", "drawing", "picture", "creative"]):
+            main_rec = ModelRecommendation(
+                name="Midjourney v6", provider="Midjourney", reasoning="Industry standard for high-fidelity AI imagery.",
+                input_price=0.00, output_price=0.00, speed="Slow", categories=["Image", "Creative"]
+            )
+            alt_rec = ModelRecommendation(
+                name="DALL-E 3", provider="OpenAI", reasoning="Great for adhering to complex prompt instructions.",
+                input_price=4.00, output_price=8.00, speed="Medium", categories=["Image", "Auto"]
             )
         
-        return ModelRecommendation(
-            name="GPT-4o",
-            provider="OpenAI",
-            reasoning="Most versatile AI for any task.",
-            input_price=2.50,
-            output_price=10.00,
-            speed="Fast",
-            categories=["Auto", "General"]
-        )
+        # Default recommendation
+        if not main_rec:
+            main_rec = ModelRecommendation(
+                name="GPT-4o", provider="OpenAI", reasoning="Most versatile AI for any task.",
+                input_price=2.50, output_price=10.00, speed="Fast", categories=["Auto", "General"]
+            )
+            alt_rec = ModelRecommendation(
+                name="Claude 3.5 Haiku", provider="Anthropic", reasoning="Fast and cost-effective alternative.",
+                input_price=0.25, output_price=1.25, speed="Very Fast", categories=["General", "Speed"]
+            )
+            
+        return {
+            "recommendation": main_rec,
+            "alternative": alt_rec
+        }

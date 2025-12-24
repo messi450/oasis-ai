@@ -26,7 +26,9 @@ async def analyze_prompt(
     start_time = time.time()
     
     # Get recommendation from AI service
-    recommendation = AIService.analyze_prompt(request.prompt)
+    result = AIService.analyze_prompt(request.prompt)
+    recommendation = result['recommendation']
+    alternative = result['alternative']
     
     # Calculate response time
     response_time_ms = (time.time() - start_time) * 1000
@@ -45,6 +47,7 @@ async def analyze_prompt(
     
     return AnalyzePromptResponse(
         recommendation=recommendation,
+        alternative=alternative,
         request_id=ai_request.id
     )
 

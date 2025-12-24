@@ -131,6 +131,7 @@ export default function Home() {
         // Analysis Mode
         const data = await ChatService.analyzePrompt(text);
         const recommendation = data.recommendation;
+        const alternative = data.alternative;
 
         const aiMessage = {
           id: Date.now() + 1,
@@ -138,6 +139,7 @@ export default function Home() {
           content: recommendation.reasoning,
           timestamp: getCurrentTime(),
           recommendation: recommendation,
+          alternative: alternative,
           role: 'ai',
           requestId: data.request_id
         };
@@ -247,11 +249,19 @@ export default function Home() {
               isUser={msg.type === 'user'}
             />
             {msg.recommendation && (
-              <div className="px-6 pb-6">
+              <div className="px-6 pb-6 space-y-4">
                 <RecommendationCard
                   recommendation={msg.recommendation}
                   onUse={handleUseModel}
+                  type="best"
                 />
+                {msg.alternative && (
+                  <RecommendationCard
+                    recommendation={msg.alternative}
+                    onUse={handleUseModel}
+                    type="alternative"
+                  />
+                )}
               </div>
             )}
           </div>

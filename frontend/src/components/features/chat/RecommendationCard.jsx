@@ -12,13 +12,16 @@ const categoryColors = {
   Auto: "bg-gray-100 text-gray-800"
 };
 
-export default function RecommendationCard({ recommendation, onUse }) {
+export default function RecommendationCard({ recommendation, onUse, type = 'best' }) {
+  const isBest = type === 'best';
+
   return (
     <div className="bg-white dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-[#334155] rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow max-w-3xl mx-auto">
       {/* Badge */}
-      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#EFF6FF] text-[#2563EB] rounded-full text-xs font-semibold mb-4">
-        <span>🏆</span>
-        <span>BEST MATCH</span>
+      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4 ${isBest ? "bg-[#EFF6FF] text-[#2563EB]" : "bg-purple-50 text-purple-600"
+        }`}>
+        <span>{isBest ? "🏆" : "✨"}</span>
+        <span>{isBest ? "BEST MATCH" : "ALTERNATIVE"}</span>
       </div>
 
       {/* Model Name & Provider */}

@@ -26,4 +26,5 @@ class ModelRecommendation(BaseModel):
 
 class AnalyzePromptResponse(BaseModel):
     recommendation: ModelRecommendation
+    alternative: Optional[ModelRecommendation] = None
     request_id: int
