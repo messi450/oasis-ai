@@ -26,6 +26,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [currentChatId, setCurrentChatId] = useState(null);
+  const [activeModel, setActiveModel] = useState(null);
   const chatContainerRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -44,6 +45,7 @@ export default function Home() {
       if (chat) {
         setCurrentChatId(chatId);
         setMessages(chat.messages || []);
+        // Set active model if it was previously selected (optional logic)
       }
     } catch (error) {
       console.error('Failed to load chat:', error);
@@ -143,12 +145,45 @@ export default function Home() {
     }
   };
 
+  const handleUseModel = (model) => {
+    setActiveModel(model);
+
+    // Add a system message to indicate model change
+    const systemMessage = {
+      id: Date.now(),
+      type: 'ai',
+      content: `🚀 Switched to ${model.name}. You are now chatting with this model.`,
+      timestamp: getCurrentTime(),
+      role: 'ai'
+    };
+
+    const updatedMessages = [...messages, systemMessage];
+    setMessages(updatedMessages);
+    saveChat(updatedMessages);
+  };
+
   const handleQuickExample = (example) => {
     handleSendMessage(example);
   };
 
   return (
     <div className="h-full flex flex-col">
+      {/* Active Model Header Banner */}
+      {activeModel && (
+        <div className="bg-[#1E293B] border-b border-[#2563EB]/20 px-4 md:px-6 py-2 flex items-center justify-center gap-2">
+          <Sparkles className="w-4 h-4 text-[#2563EB]" />
+          <span className="text-xs md:text-sm font-medium text-[#2563EB]">
+            Active Model: <span className="font-bold">{activeModel.name}</span>
+          </span>
+          <button
+            onClick={() => setActiveModel(null)}
+            className="ml-2 text-[10px] text-[#64748B] hover:text-[#0F172A] underline"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {/* Chat Messages Area */}
       <div
         ref={chatContainerRef}
@@ -197,7 +232,10 @@ export default function Home() {
             />
             {msg.recommendation && (
               <div className="px-6 pb-6">
-                <RecommendationCard recommendation={msg.recommendation} />
+                <RecommendationCard
+                  recommendation={msg.recommendation}
+                  onUse={handleUseModel}
+                />
               </div>
             )}
           </div>

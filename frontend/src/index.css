@@ -110,6 +110,7 @@ button:focus-visible {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -152,7 +153,70 @@ button:focus-visible {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Base styles for both modes */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light Mode (Explicit) */
+:root:not(.dark) body,
+:root:not(.dark) .bg-\[\#F6F7FB\],
+:root:not(.dark) main {
+  background-color: #F6F7FB !important;
+  color: #0F172A;
+}
+
+:root:not(.dark) .bg-white {
+  background-color: #FFFFFF !important;
+}
+
+/* Custom Project Dark Mode Overrides */
+.dark body,
+.dark .bg-\[\#F6F7FB\],
+.dark main {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+}
+
+.dark .bg-white,
+.dark header,
+.dark aside,
+.dark .bg-white.border {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+.dark .text-\[\#0F172A\] {
+  color: #F8FAFC !important;
+}
+
+.dark .text-\[\#64748B\] {
+  color: #94A3B8 !important;
+}
+
+.dark .border-\[\#E2E8F0\] {
+  border-color: #334155 !important;
+}
+
+.dark .hover\:bg-\[\#F6F7FB\]:hover {
+  background-color: #2D3748 !important;
+}
+
+.dark .bg-\[\#EFF6FF\] {
+  background-color: #1E3A8A !important;
+  color: #DBEAFE !important;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1E293B !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important;
 }

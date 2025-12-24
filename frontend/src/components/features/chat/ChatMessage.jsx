@@ -3,7 +3,7 @@ import { User, Brain } from "lucide-react";
 
 export default function ChatMessage({ message, timestamp, isUser }) {
   return (
-    <div className="flex gap-3 md:gap-4 px-4 md:px-6 py-4 md:py-6 hover:bg-white transition-colors">
+    <div className="flex gap-3 md:gap-4 px-4 md:px-6 py-4 md:py-6 hover:bg-white dark:hover:bg-slate-800 transition-colors">
       {/* Avatar */}
       <div className="shrink-0">
         {isUser ? (
@@ -21,7 +21,7 @@ export default function ChatMessage({ message, timestamp, isUser }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 mb-1 md:mb-2">
           <span className="text-sm font-semibold text-[#0F172A]">
-            {isUser ? "You" : "AI NeuroHub"}
+            {isUser ? "You" : "OASIS"}
           </span>
           <span className="text-xs text-[#64748B]">{timestamp}</span>
         </div>
