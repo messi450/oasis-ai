@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,7 +22,7 @@ services:
     ports:
       - "6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,7 +30,7 @@ services:
   api:
     build: .
     ports:
-      - "8000:8000"
+      - "8080:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/oasis
       - REDIS_URL=redis://redis:6379/0
