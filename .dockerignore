@@ -1,0 +1,14 @@
+frontend/node_modules
+backend/node_modules
+node_modules
+**/__pycache__
+**/.venv
+**/venv
+**/env
+.git
+.github
+dist
+build
+*.db
+*.sqlite3
+.env
