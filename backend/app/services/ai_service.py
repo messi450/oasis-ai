@@ -1,38 +1,44 @@
-import google.generativeai as genai
+from groq import Groq
 import json
 from app.schemas.ai import ModelRecommendation
 from app.config.settings import settings
 from app.config.logging import logger
 
 class AIService:
-    """Business logic for AI model recommendations using Gemini"""
+    """Business logic for AI model recommendations using Groq"""
     
-    _client_initialized = False
+    _client = None
 
     @classmethod
     def _init_client(cls):
-        if not cls._client_initialized and settings.GOOGLE_API_KEY:
-            genai.configure(api_key=settings.GOOGLE_API_KEY)
-            cls._client_initialized = True
+        if not cls._client and settings.GROQ_API_KEY:
+            cls._client = Groq(api_key=settings.GROQ_API_KEY)
 
     @staticmethod
     def chat_with_model(message: str, model_name: str, history: list = None) -> str:
-        """Chat with the selected AI model (Simulated or Real via Gemini)"""
+        """Chat with the selected AI model using Groq"""
         
-        # Use Gemini for everything if key is present, pretending to be the selected model
-        if settings.GOOGLE_API_KEY:
+        if settings.GROQ_API_KEY:
             try:
                 AIService._init_client()
-                # Use gemini-pro for better availability
-                model = genai.GenerativeModel('gemini-pro')
                 
-                # Context instruction to act like the requested model
-                system_context = f"You are acting as {model_name}. Please respond to the user accordingly."
+                # Build messages for Groq
+                messages = [
+                    {"role": "system", "content": f"You are acting as {model_name}. Please respond to the user accordingly."},
+                    {"role": "user", "content": message}
+                ]
                 
-                response = model.generate_content(f"{system_context}\n\nUser: {message}")
-                return response.text
+                response = AIService._client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=1024
+                )
+                
+                return response.choices[0].message.content
+                
             except Exception as e:
-                logger.error(f"Gemini Chat API failed: {str(e)}", exc_info=True)
+                logger.error(f"Groq Chat API failed: {str(e)}", exc_info=True)
                 return f"Error connecting to AI: {str(e)}"
         
         # Mock fallback if no key
@@ -40,38 +46,47 @@ class AIService:
 
     @staticmethod
     def analyze_prompt(prompt: str) -> ModelRecommendation:
-        """Analyze a prompt and recommend the best AI model using Gemini"""
+        """Analyze a prompt and recommend the best AI model using Groq"""
         
-        # Try using Gemini if API key is available
-        if settings.GOOGLE_API_KEY:
+        # Try using Groq if API key is available
+        if settings.GROQ_API_KEY:
             try:
                 AIService._init_client()
-                model = genai.GenerativeModel('gemini-pro')
                 
-                system_prompt = """
-                Analyze the user's prompt and recommend the best AI model for the task.
-                Consider these models:
-                1. OpenAI o3 (Code/Complex Logic)
-                2. Claude 3.5 Sonnet (Writing/Nuance)
-                3. Gemini 1.5 Pro (Data Analysis/Long Context)
-                4. GPT-4o (General Purpose)
+                system_prompt = """You are an AI model recommendation expert. Analyze the user's prompt and recommend ONE best AI model.
+
+Return ONLY valid JSON (no markdown, no extra text):
+{
+    "name": "Model Name",
+    "provider": "Provider Name", 
+    "reasoning": "One short sentence explaining why this is the best choice.",
+    "input_price": 2.5,
+    "output_price": 10.0,
+    "speed": "Fast",
+    "categories": ["Category1", "Category2"]
+}
+
+Available models:
+- OpenAI o3 (best for code/debugging)
+- Claude 3.5 Sonnet (best for writing/content)
+- Gemini 1.5 Pro (best for data analysis/research)
+- GPT-4o (best for general tasks)
+
+Keep reasoning under 15 words. Be direct."""
                 
-                Return ONLY a valid JSON object with these exact fields:
-                {
-                    "name": "Model Name",
-                    "provider": "Provider Name",
-                    "reasoning": "Short explanation why",
-                    "input_price": float (cost per 1M tokens),
-                    "output_price": float (cost per 1M tokens),
-                    "speed": "Fast" | "Medium" | "Slow",
-                    "categories": ["Category1", "Category2", "Category3"]
-                }
-                """
+                response = AIService._client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": f"User Prompt: {prompt}"}
+                    ],
+                    temperature=0.3,
+                    max_tokens=512
+                )
                 
-                response = model.generate_content(f"{system_prompt}\n\nUser Prompt: {prompt}")
+                text = response.choices[0].message.content.strip()
                 
-                # specific cleanup for potential markdown code blocks in response
-                text = response.text.strip()
+                # Clean up markdown code blocks if present
                 if text.startswith("```json"):
                     text = text[7:]
                 if text.startswith("```"):
@@ -84,7 +99,7 @@ class AIService:
                 return ModelRecommendation(**data)
                 
             except Exception as e:
-                logger.error(f"Gemini Analysis API failed: {str(e)}", exc_info=True)
+                logger.error(f"Groq Analysis API failed: {str(e)}", exc_info=True)
                 # Fallback to static logic below
         
         prompt_lower = prompt.lower()
