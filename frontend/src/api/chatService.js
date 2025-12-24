@@ -26,6 +26,11 @@ export const ChatService = {
         return response.data;
     },
 
+    getUsage: async () => {
+        const response = await apiClient.get('/ai/usage');
+        return response.data;
+    },
+
     // LocalStorage (History)
     list: async () => {
         // Simulate API delay

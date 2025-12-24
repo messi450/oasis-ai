@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.ai_request import AIRequest
-from typing import Optional
+from typing import Optional, List
 
 
 class AILogsRepository:
@@ -36,6 +36,13 @@ class AILogsRepository:
         return ai_request
     
     @staticmethod
-    def get_by_id(db: Session, request_id: int) -> Optional[AIRequest]:
-        """Get an AI request by ID"""
-        return db.query(AIRequest).filter(AIRequest.id == request_id).first()
+    def list(db: Session, skip: int = 0, limit: int = 100) -> List[AIRequest]:
+        """List AI requests with pagination"""
+        return db.query(AIRequest).order_by(AIRequest.created_at.desc()).offset(skip).limit(limit).all()
+
+    @staticmethod
+    def get_stats(db: Session):
+        """Get summary stats for dashboard"""
+        # This is a simple implementation, could be optimized with raw SQL or complex queries
+        requests = db.query(AIRequest).all()
+        return requests

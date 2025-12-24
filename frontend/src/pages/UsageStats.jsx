@@ -1,156 +1,224 @@
-import React from "react";
-import { TrendingUp, MessageSquare, DollarSign, Clock, Calendar } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  MessageSquare,
+  DollarSign,
+  Clock,
+  Calendar
+} from "lucide-react";
 
-const statCards = [
-  {
-    title: "Total Queries",
-    value: "1,247",
-    change: "+12.5%",
-    trend: "up",
-    icon: MessageSquare,
-    color: "bg-[#EFF6FF] text-[#2563EB]"
-  },
-  {
-    title: "This Month",
-    value: "183",
-    change: "+8.2%",
-    trend: "up",
-    icon: Calendar,
-    color: "bg-[#F0FDF4] text-[#16A34A]"
-  },
-  {
-    title: "Avg. Response Time",
-    value: "1.2s",
-    change: "-0.3s",
-    trend: "down",
-    icon: Clock,
-    color: "bg-[#FEF9C3] text-[#CA8A04]"
-  },
-  {
-    title: "Estimated Savings",
-    value: "$45.30",
-    change: "+$12.50",
-    trend: "up",
-    icon: DollarSign,
-    color: "bg-[#FEF2F2] text-[#DC2626]"
+import { ChatService } from "@/api/chatService";
+
+/* ======================================================
+   CONFIG — replace with real API later
+====================================================== */
+const fetchUsageEvents = async () => {
+  try {
+    const data = await ChatService.getUsage();
+    return data.map(item => ({
+      id: item.id,
+      timestamp: item.created_at,
+      model: item.recommended_model,
+      query: item.prompt,
+      cost: item.estimated_cost || 0,
+      responseTimeMs: item.response_time_ms || 0
+    }));
+  } catch (error) {
+    console.error("Failed to fetch usage stats:", error);
+    return [];
   }
-];
+};
 
-const recentActivity = [
-  { model: "OpenAI o3", query: "Debug Python code", time: "2 hours ago", cost: "$0.05" },
-  { model: "Claude 3.5 Sonnet", query: "Write blog post", time: "5 hours ago", cost: "$0.12" },
-  { model: "Gemini 1.5 Pro", query: "Analyze sales data", time: "Yesterday", cost: "$0.03" },
-  { model: "GPT-4o", query: "Generate marketing copy", time: "2 days ago", cost: "$0.08" },
-  { model: "DeepSeek-R1", query: "Code review", time: "3 days ago", cost: "$0.01" }
-];
+/* ======================================================
+   HELPERS
+====================================================== */
+const isThisMonth = (date) => {
+  const now = new Date();
+  return (
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear()
+  );
+};
 
+/* ======================================================
+   COMPONENT
+====================================================== */
 export default function UsageStats() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUsageEvents().then((data) => {
+      setEvents(data);
+      setLoading(false);
+    });
+  }, []);
+
+  /* ======================================================
+     CALCULATIONS (REAL)
+  ====================================================== */
+  const totalQueries = events.length;
+
+  const monthlyQueries = events.filter((e) =>
+    isThisMonth(new Date(e.timestamp))
+  ).length;
+
+  const avgResponseTime =
+    events.length === 0
+      ? 0
+      : (
+        events.reduce((sum, e) => sum + e.responseTimeMs, 0) /
+        events.length /
+        1000
+      ).toFixed(2);
+
+  const totalCost = events.reduce((sum, e) => sum + e.cost, 0).toFixed(2);
+
+  const modelUsage = useMemo(() => {
+    const map = {};
+    events.forEach((e) => {
+      map[e.model] = (map[e.model] || 0) + 1;
+    });
+
+    const total = events.length || 1;
+
+    return Object.entries(map).map(([name, count]) => ({
+      name,
+      percent: Math.round((count / total) * 100)
+    }));
+  }, [events]);
+
+  const usageByMonth = useMemo(() => {
+    const months = Array(12).fill(0);
+
+    events.forEach((e) => {
+      const m = new Date(e.timestamp).getMonth();
+      months[m]++;
+    });
+
+    return months;
+  }, [events]);
+
+  /* ======================================================
+     UI DATA
+  ====================================================== */
+  const statCards = [
+    {
+      title: "Total Queries",
+      value: totalQueries,
+      icon: MessageSquare
+    },
+    {
+      title: "This Month",
+      value: monthlyQueries,
+      icon: Calendar
+    },
+    {
+      title: "Avg. Response Time",
+      value: `${avgResponseTime}s`,
+      icon: Clock
+    },
+    {
+      title: "Estimated Cost",
+      value: `$${totalCost}`,
+      icon: DollarSign
+    }
+  ];
+
+  if (loading) {
+    return (
+      <div className="p-8 text-sm text-[#64748B]">
+        Loading usage statistics…
+      </div>
+    );
+  }
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-6xl mx-auto p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-[#0F172A] mb-2">Usage Statistics</h1>
+          <h1 className="text-2xl font-semibold text-[#0F172A] mb-2">
+            Usage Statistics
+          </h1>
           <p className="text-sm text-[#64748B]">
-            Track your AI usage and performance metrics
+            Real-time AI usage and performance metrics
           </p>
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {statCards.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.title} className="bg-white border border-[#E2E8F0] rounded-[16px] p-6 shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
-                <div className="flex items-start justify-between mb-3">
-                  <div className={`w-10 h-10 ${stat.color} rounded-full flex items-center justify-center`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <span className={`text-xs font-medium ${stat.trend === 'up' ? 'text-[#16A34A]' : 'text-[#DC2626]'
-                    }`}>
-                    {stat.change}
-                  </span>
-                </div>
-                <p className="text-sm text-[#64748B] mb-1">{stat.title}</p>
-                <p className="text-2xl font-semibold text-[#0F172A]">{stat.value}</p>
+              <div
+                key={stat.title}
+                className="bg-white border border-[#E2E8F0] rounded-[16px] p-6"
+              >
+                <Icon className="w-5 h-5 mb-3 text-[#2563EB]" />
+                <p className="text-sm text-[#64748B]">{stat.title}</p>
+                <p className="text-2xl font-semibold text-[#0F172A]">
+                  {stat.value}
+                </p>
               </div>
             );
           })}
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Usage Over Time */}
-          <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-6 shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
-            <h2 className="text-lg font-semibold text-[#0F172A] mb-4">Usage Over Time</h2>
-            <div className="h-64 flex items-end justify-between gap-2">
-              {[45, 62, 58, 72, 68, 85, 92, 78, 95, 88, 102, 96].map((height, idx) => (
-                <div key={idx} className="flex-1 flex flex-col items-center">
-                  <div
-                    className="w-full bg-[#2563EB] rounded-t-[8px]"
-                    style={{ height: `${height}%` }}
-                  />
-                  <span className="text-xs text-[#64748B] mt-2">
-                    {['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'][idx]}
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* Usage Over Time */}
+        <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-6 mb-8">
+          <h2 className="text-lg font-semibold mb-4">Usage Over Time</h2>
+          <div className="h-64 flex items-end gap-2">
+            {usageByMonth.map((value, i) => (
+              <div key={i} className="flex-1">
+                <div
+                  className="bg-[#2563EB] rounded-t-[8px]"
+                  style={{ height: `${value * 5}px` }}
+                />
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Model Distribution */}
-          <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-6 shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
-            <h2 className="text-lg font-semibold text-[#0F172A] mb-4">Most Used Models</h2>
-            <div className="space-y-4">
-              {[
-                { name: "GPT-4o", percent: 35, color: "bg-[#2563EB]" },
-                { name: "Claude 3.5 Sonnet", percent: 28, color: "bg-[#16A34A]" },
-                { name: "Gemini 1.5 Pro", percent: 22, color: "bg-[#CA8A04]" },
-                { name: "OpenAI o3", percent: 10, color: "bg-[#DC2626]" },
-                { name: "Others", percent: 5, color: "bg-[#64748B]" }
-              ].map((model) => (
-                <div key={model.name}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-[#0F172A]">{model.name}</span>
-                    <span className="text-sm font-medium text-[#64748B]">{model.percent}%</span>
-                  </div>
-                  <div className="h-2 bg-[#F6F7FB] rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${model.color} transition-all duration-500 rounded-full`}
-                      style={{ width: `${model.percent}%` }}
-                    />
-                  </div>
+        {/* Model Distribution */}
+        <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-6 mb-8">
+          <h2 className="text-lg font-semibold mb-4">Most Used Models</h2>
+          <div className="space-y-3">
+            {modelUsage.map((model) => (
+              <div key={model.name}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>{model.name}</span>
+                  <span>{model.percent}%</span>
                 </div>
-              ))}
-            </div>
+                <div className="h-2 bg-[#F6F7FB] rounded-full">
+                  <div
+                    className="h-full bg-[#2563EB] rounded-full"
+                    style={{ width: `${model.percent}%` }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-6 shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
-          <h2 className="text-lg font-semibold text-[#0F172A] mb-4">Recent Activity</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[#E2E8F0]">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-[#64748B]">Model</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-[#64748B]">Query</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-[#64748B]">Time</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-[#64748B]">Cost</th>
+        <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-6">
+          <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
+          <table className="w-full text-sm">
+            <tbody>
+              {events.slice(0, 10).map((e) => (
+                <tr key={e.id} className="border-b">
+                  <td className="py-2">{e.model}</td>
+                  <td className="py-2 text-[#64748B]">{e.query}</td>
+                  <td className="py-2 text-right">${e.cost?.toFixed(3) || "0.000"}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {recentActivity.map((activity, idx) => (
-                  <tr key={idx} className="border-b border-[#E2E8F0] hover:bg-[#F6F7FB] transition-colors">
-                    <td className="py-3 px-4 text-sm font-medium text-[#0F172A]">{activity.model}</td>
-                    <td className="py-3 px-4 text-sm text-[#64748B]">{activity.query}</td>
-                    <td className="py-3 px-4 text-sm text-[#64748B]">{activity.time}</td>
-                    <td className="py-3 px-4 text-sm font-medium text-[#0F172A] text-right">{activity.cost}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
+          {events.length === 0 && (
+            <div className="text-center py-8 text-[#64748B]">
+              No activity recorded yet.
+            </div>
+          )}
         </div>
       </div>
     </div>

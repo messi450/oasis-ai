@@ -47,3 +47,14 @@ async def analyze_prompt(
         recommendation=recommendation,
         request_id=ai_request.id
     )
+@router.get("/usage")
+async def get_usage_stats(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """
+    Get AI usage statistics and logs.
+    """
+    logs = AILogsRepository.list(db=db, skip=skip, limit=limit)
+    return logs
