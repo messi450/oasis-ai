@@ -14,5 +14,5 @@ class AIRequest(Base):
     reasoning = Column(Text)
     response_time_ms = Column(Float)
     estimated_cost = Column(Float)
-    metadata = Column(JSON)
+    request_metadata = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

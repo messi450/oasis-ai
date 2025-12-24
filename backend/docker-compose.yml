@@ -30,7 +30,7 @@ services:
   api:
     build: .
     ports:
-      - "8080:8000"
+      - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/oasis
       - REDIS_URL=redis://redis:6379/0
