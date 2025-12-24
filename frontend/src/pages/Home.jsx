@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import ChatMessage from "@/components/features/chat/ChatMessage";
 import RecommendationCard from "@/components/features/chat/RecommendationCard";
-import CategoryFilters from "@/components/features/chat/CategoryFilters";
 import ChatInput from "@/components/features/chat/ChatInput";
 import { Loader2, Sparkles } from "lucide-react";
 import { ChatService } from "@/api/chatService";
@@ -24,7 +23,6 @@ const getCurrentTime = () => {
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(null);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [activeModel, setActiveModel] = useState(null);
   const chatContainerRef = useRef(null);
@@ -278,13 +276,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* Category Filters (show only when there are messages) */}
-      {messages.length > 0 && (
-        <CategoryFilters
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
-      )}
+
 
       {/* Chat Input */}
       <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
