@@ -14,56 +14,7 @@ const quickExamples = [
   "Generate marketing copy"
 ];
 
-// Generate recommendations based on prompt
-const generateRecommendations = (prompt) => {
-  const promptLower = prompt.toLowerCase();
 
-  if (promptLower.includes("code") || promptLower.includes("debug") || promptLower.includes("programming")) {
-    return {
-      name: "OpenAI o3",
-      provider: "OpenAI",
-      reasoning: "Top performer on coding leaderboards with exceptional debugging capabilities. Excellent for complex bug fixes, code review, and algorithmic problem-solving.",
-      inputPrice: 2.00,
-      outputPrice: 8.00,
-      speed: "Fast",
-      categories: ["Code", "Analysis", "Auto"]
-    };
-  }
-
-  if (promptLower.includes("write") || promptLower.includes("blog") || promptLower.includes("content")) {
-    return {
-      name: "Claude 3.5 Sonnet",
-      provider: "Anthropic",
-      reasoning: "Exceptional writing quality with natural, engaging prose. Perfect for long-form content, creative writing, and professional communication.",
-      inputPrice: 3.00,
-      outputPrice: 15.00,
-      speed: "Fast",
-      categories: ["Writing", "Creative", "Auto"]
-    };
-  }
-
-  if (promptLower.includes("data") || promptLower.includes("analyze") || promptLower.includes("analysis")) {
-    return {
-      name: "Gemini 1.5 Pro",
-      provider: "Google",
-      reasoning: "Best for data analysis with massive 1M token context window. Excellent at processing large datasets and generating actionable insights.",
-      inputPrice: 1.25,
-      outputPrice: 5.00,
-      speed: "Fast",
-      categories: ["Data", "Analysis", "Research"]
-    };
-  }
-
-  return {
-    name: "GPT-4o",
-    provider: "OpenAI",
-    reasoning: "The most versatile AI model available. Excellent at a wide range of tasks including conversation, analysis, coding, and creative work.",
-    inputPrice: 2.50,
-    outputPrice: 10.00,
-    speed: "Fast",
-    categories: ["Auto", "Analysis", "Writing"]
-  };
-};
 
 const getCurrentTime = () => {
   const now = new Date();
@@ -156,27 +107,40 @@ export default function Home() {
     setMessages(updatedMessages);
     setIsLoading(true);
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1200));
+    // Generate recommendation from Backend
+    try {
+      const data = await ChatService.analyzePrompt(text);
+      const recommendation = data.recommendation;
 
-    // Generate recommendation
-    const recommendation = generateRecommendations(text);
+      const aiMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        content: recommendation.reasoning, // Use reasoning as the message content
+        timestamp: getCurrentTime(),
+        recommendation: recommendation,
+        role: 'ai',
+        requestId: data.request_id
+      };
 
-    const aiMessage = {
-      id: Date.now() + 1,
-      type: 'ai',
-      content: 'Based on your request, here\'s my recommendation:',
-      timestamp: getCurrentTime(),
-      recommendation,
-      role: 'ai'
-    };
+      const finalMessages = [...updatedMessages, aiMessage];
+      setMessages(finalMessages);
 
-    const finalMessages = [...updatedMessages, aiMessage];
-    setMessages(finalMessages);
-    setIsLoading(false);
-
-    // Save chat to database
-    saveChat(finalMessages);
+      // Save chat to database (local history)
+      saveChat(finalMessages);
+    } catch (error) {
+      console.error('Failed to get recommendation:', error);
+      // Add error message
+      const errorMessage = {
+        id: Date.now() + 1,
+        type: 'ai',
+        content: 'Sorry, I encountered an error while analyzing your request. Please try again.',
+        timestamp: getCurrentTime(),
+        role: 'ai'
+      };
+      setMessages([...updatedMessages, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleQuickExample = (example) => {

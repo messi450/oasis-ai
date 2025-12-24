@@ -1,6 +1,8 @@
 
 // Simple LocalStorage wrapper to replace Base44 backend
 
+import { apiClient } from './client';
+
 const STORAGE_KEY = 'oasis_chats';
 
 const getChats = () => {
@@ -13,6 +15,18 @@ const saveChats = (chats) => {
 };
 
 export const ChatService = {
+    // Real Backend API
+    analyzePrompt: async (prompt, userId = null) => {
+        const response = await apiClient.post('/ai/analyze-prompt', { prompt, user_id: userId });
+        return response.data;
+    },
+
+    submitFeedback: async (feedbackData) => {
+        const response = await apiClient.post('/feedback/feedback', feedbackData);
+        return response.data;
+    },
+
+    // LocalStorage (History)
     list: async () => {
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 500));
