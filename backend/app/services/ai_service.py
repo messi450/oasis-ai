@@ -23,8 +23,8 @@ class AIService:
         if settings.GOOGLE_API_KEY:
             try:
                 AIService._init_client()
-                # Use gemini-1.5-flash for faster response and better availability
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                # Use gemini-pro for better availability
+                model = genai.GenerativeModel('gemini-pro')
                 
                 # Context instruction to act like the requested model
                 system_context = f"You are acting as {model_name}. Please respond to the user accordingly."
@@ -46,7 +46,7 @@ class AIService:
         if settings.GOOGLE_API_KEY:
             try:
                 AIService._init_client()
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('gemini-pro')
                 
                 system_prompt = """
                 Analyze the user's prompt and recommend the best AI model for the task.
