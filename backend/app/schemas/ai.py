@@ -4,12 +4,14 @@ from typing import List, Optional
 class AnalyzePromptRequest(BaseModel):
     prompt: str
     user_id: Optional[int] = None
+    client_id: Optional[str] = None
 
 class ChatRequest(BaseModel):
     message: str
     model_name: str
     history: Optional[List[dict]] = []
     user_id: Optional[int] = None
+    client_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
     response: str

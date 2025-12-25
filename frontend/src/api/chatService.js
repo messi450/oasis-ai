@@ -14,10 +14,23 @@ const saveChats = (chats) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
 };
 
+const getClientId = () => {
+    let clientId = localStorage.getItem('oasis_client_id');
+    if (!clientId) {
+        clientId = crypto.randomUUID();
+        localStorage.setItem('oasis_client_id', clientId);
+    }
+    return clientId;
+};
+
 export const ChatService = {
     // Real Backend API
     analyzePrompt: async (prompt, userId = null) => {
-        const response = await apiClient.post('/ai/analyze-prompt', { prompt, user_id: userId });
+        const response = await apiClient.post('/ai/analyze-prompt', {
+            prompt,
+            user_id: userId,
+            client_id: getClientId()
+        });
         return response.data;
     },
 
@@ -25,18 +38,24 @@ export const ChatService = {
         const response = await apiClient.post('/ai/chat', {
             message,
             model_name: modelName,
-            history
+            history,
+            client_id: getClientId()
         });
         return response.data;
     },
 
     submitFeedback: async (feedbackData) => {
-        const response = await apiClient.post('/feedback/feedback', feedbackData);
+        const response = await apiClient.post('/feedback/feedback', {
+            ...feedbackData,
+            client_id: getClientId()
+        });
         return response.data;
     },
 
     getUsage: async () => {
-        const response = await apiClient.get('/ai/usage');
+        const response = await apiClient.get('/ai/usage', {
+            params: { client_id: getClientId() }
+        });
         return response.data;
     },
 

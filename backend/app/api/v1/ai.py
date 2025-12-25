@@ -41,6 +41,7 @@ async def analyze_prompt(
         provider=recommendation.provider,
         reasoning=recommendation.reasoning,
         user_id=request.user_id,
+        client_id=request.client_id,
         response_time_ms=response_time_ms,
         estimated_cost=recommendation.input_price
     )
@@ -74,10 +75,11 @@ async def chat(
 async def get_usage_stats(
     skip: int = 0,
     limit: int = 100,
+    client_id: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     """
     Get AI usage statistics and logs.
     """
-    logs = AILogsRepository.list(db=db, skip=skip, limit=limit)
+    logs = AILogsRepository.list(db=db, skip=skip, limit=limit, client_id=client_id)
     return logs

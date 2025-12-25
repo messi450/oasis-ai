@@ -8,6 +8,7 @@ class AIRequest(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    client_id = Column(String, index=True, nullable=True)
     prompt = Column(Text, nullable=False)
     recommended_model = Column(String, nullable=False)
     provider = Column(String, nullable=False)

@@ -14,6 +14,7 @@ class AILogsRepository:
         provider: str,
         reasoning: str,
         user_id: Optional[int] = None,
+        client_id: Optional[str] = None,
         response_time_ms: Optional[float] = None,
         estimated_cost: Optional[float] = None
     ) -> AIRequest:
@@ -21,6 +22,7 @@ class AILogsRepository:
         
         ai_request = AIRequest(
             user_id=user_id,
+            client_id=client_id,
             prompt=prompt,
             recommended_model=recommended_model,
             provider=provider,
@@ -36,9 +38,17 @@ class AILogsRepository:
         return ai_request
     
     @staticmethod
-    def list(db: Session, skip: int = 0, limit: int = 100) -> List[AIRequest]:
+    def list(db: Session, skip: int = 0, limit: int = 100, client_id: Optional[str] = None) -> List[AIRequest]:
         """List AI requests with pagination"""
-        return db.query(AIRequest).order_by(AIRequest.created_at.desc()).offset(skip).limit(limit).all()
+        query = db.query(AIRequest)
+        if client_id:
+            query = query.filter(AIRequest.client_id == client_id)
+        return query.order_by(AIRequest.created_at.desc()).offset(skip).limit(limit).all()
+
+    @staticmethod
+    def get_by_id(db: Session, request_id: int) -> Optional[AIRequest]:
+        """Get a specific AI request log by ID"""
+        return db.query(AIRequest).filter(AIRequest.id == request_id).first()
 
     @staticmethod
     def get_stats(db: Session):
