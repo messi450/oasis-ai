@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Plus, MessageSquare, Settings, BarChart3, Trash2, Search, Edit2, ChevronDown, ChevronRight, Code, FileText, BarChart, Sparkles, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ const topicColors = {
 
 export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [hoveredChat, setHoveredChat] = useState(null);
   const [editingChat, setEditingChat] = useState(null);
   const [editTitle, setEditTitle] = useState("");
@@ -129,7 +130,7 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
         {/* New Chat Button */}
         <div className="p-4">
           <Button
-            onClick={() => window.location.href = createPageUrl("Home")}
+            onClick={() => navigate(createPageUrl("Home"))}
             className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-medium h-10 rounded-[10px] transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4 mr-2" />

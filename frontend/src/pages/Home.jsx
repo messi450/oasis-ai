@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import ChatMessage from "@/components/features/chat/ChatMessage";
+import { useSearchParams } from "react-router-dom";
 import RecommendationCard from "@/components/features/chat/RecommendationCard";
 import ChatInput from "@/components/features/chat/ChatInput";
 import { Loader2, Sparkles } from "lucide-react";
@@ -28,14 +29,19 @@ export default function Home() {
   const chatContainerRef = useRef(null);
   const queryClient = useQueryClient();
 
-  // Get chatId from URL if present
+  const [searchParams, setSearchParams] = useSearchParams();
+  const chatIdParam = searchParams.get('chatId');
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const chatId = params.get('chatId');
-    if (chatId) {
-      loadChat(chatId);
+    if (chatIdParam) {
+      loadChat(chatIdParam);
+    } else {
+      // Reset for New Chat
+      setCurrentChatId(null);
+      setMessages([]);
+      setActiveModel(null);
     }
-  }, []);
+  }, [chatIdParam]);
 
   const loadChat = async (chatId) => {
     try {
@@ -66,9 +72,7 @@ export default function Home() {
         setCurrentChatId(newChat.id);
 
         // Update URL without reloading
-        const url = new URL(window.location);
-        url.searchParams.set('chatId', newChat.id);
-        window.history.pushState({}, '', url);
+        setSearchParams({ chatId: newChat.id });
       }
       queryClient.invalidateQueries({ queryKey: ['chats'] });
     } catch (error) {
