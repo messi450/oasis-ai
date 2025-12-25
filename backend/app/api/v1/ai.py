@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.models.base import get_db
 from app.schemas.ai import AnalyzePromptRequest, AnalyzePromptResponse, ChatRequest, ChatResponse
