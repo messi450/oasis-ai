@@ -82,8 +82,8 @@ button:focus-visible {
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
@@ -118,8 +118,8 @@ button:focus-visible {
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14.9%;
@@ -130,7 +130,7 @@ button:focus-visible {
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --ring: 224.3 76.3% 48%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -163,14 +163,35 @@ button:focus-visible {
 }
 
 /* Scrollbar Styles */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #F6F7FB; }
-.dark ::-webkit-scrollbar-track { background: #0F172A; }
-::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 4px; }
-.dark ::-webkit-scrollbar-thumb { background: #334155; }
-::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-.chat-container { scroll-behavior: smooth; }
+::-webkit-scrollbar-track {
+  background: #F6F7FB;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #CBD5E1;
+}
+
+.chat-container {
+  scroll-behavior: smooth;
+}
 
 /* Logo Inversion for Dark Mode */
 .dark .logo-invert {
@@ -179,19 +200,33 @@ button:focus-visible {
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.animate-slide-in { animation: slideInLeft 0.3s ease-out forwards; }
+.animate-slide-in {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
 
 /* Custom Overrides (cleaner implementation) */
-.dark .bg-white, .dark header, .dark aside, .dark .bg-white.border {
+.dark .bg-white,
+.dark header,
+.dark aside,
+.dark .bg-white.border {
   background-color: #1E293B !important;
   border-color: #334155 !important;
 }
 
-.dark input, .dark textarea, .dark select {
+.dark input,
+.dark textarea,
+.dark select {
   background-color: #1E293B !important;
   color: #F8FAFC !important;
   border-color: #334155 !important;

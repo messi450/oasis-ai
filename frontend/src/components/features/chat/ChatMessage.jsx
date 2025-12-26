@@ -11,8 +11,8 @@ export default function ChatMessage({ message, timestamp, isUser }) {
             <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" />
           </div>
         ) : (
-          <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[#E2E8F0] flex items-center justify-center">
-            <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#2563EB]" />
+          <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+            <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#2563EB] dark:text-blue-400" />
           </div>
         )}
       </div>
@@ -20,12 +20,12 @@ export default function ChatMessage({ message, timestamp, isUser }) {
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 mb-1 md:mb-2">
-          <span className="text-sm font-semibold text-[#0F172A]">
+          <span className="text-sm font-semibold text-slate-900 dark:text-white">
             {isUser ? "You" : "OASIS"}
           </span>
-          <span className="text-xs text-[#64748B]">{timestamp}</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">{timestamp}</span>
         </div>
-        <div className="text-sm text-[#0F172A] leading-relaxed break-words">
+        <div className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed break-words">
           {message}
         </div>
       </div>
