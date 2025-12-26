@@ -138,7 +138,6 @@ Return ONLY valid JSON (no markdown):
                 data = json.loads(text.strip())
                 
                 logger.info("✅ Perplexity successfully generated recommendations!")
-                print("\n\n>>>>>>>>>> PERPLEXITY IS CONFIRMED WORKING AND USED <<<<<<<<<<\n\n")
                 
                 return {
                     "recommendation": ModelRecommendation(**data['main']),
