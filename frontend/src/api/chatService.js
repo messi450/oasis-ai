@@ -59,6 +59,14 @@ export const ChatService = {
         return response.data;
     },
 
+    monitorContext: async (messages, currentModel) => {
+        const response = await apiClient.post('/ai/monitor-context', {
+            messages,
+            current_model: currentModel
+        });
+        return response.data;
+    },
+
     // LocalStorage (History)
     list: async () => {
         // Simulate API delay

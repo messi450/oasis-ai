@@ -21,13 +21,15 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # CORS
-    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+    # CORS
+    CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,*"
     
     # AI Services
     OPENAI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
     GROQ_API_KEY: str = ""
+    PERPLEXITY_API_KEY: str = ""
     
     # Observability
     ENABLE_METRICS: bool = True

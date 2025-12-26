@@ -101,27 +101,27 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
       <div className={`
         fixed lg:relative
         inset-y-0 left-0
-        bg-white border-r border-[#E2E8F0] 
+        bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 
         flex flex-col h-screen shrink-0 shadow-sm
         transform transition-all duration-300 ease-in-out z-50
         ${isOpen ? 'w-60 translate-x-0' : 'w-0 -translate-x-full lg:translate-x-[-100%] lg:border-none'}
         overflow-hidden
       `}>
         {/* Logo */}
-        <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between">
+        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <Link to={createPageUrl("Home")} className="flex items-center gap-2">
             <img
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694b184dc984102a3c47b3d7/ae24ff3a8_image.png"
               alt="OASIS"
-              className="w-8 h-8 logo-invert"
+              className="w-8 h-8 logo-invert dark:invert"
             />
-            <span className="text-base font-semibold text-[#0F172A]">OASIS</span>
+            <span className="text-base font-semibold text-slate-900 dark:text-white">OASIS</span>
           </Link>
           <button
             onClick={onToggle}
-            className="lg:hidden p-1 hover:bg-[#F6F7FB] rounded-[10px]"
+            className="lg:hidden p-1 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-[10px]"
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-[#64748B]">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-slate-500 dark:text-slate-400">
               <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
@@ -141,12 +141,12 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
         {/* Search Bar */}
         <div className="px-4 py-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400" />
             <Input
               placeholder="Search chats..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 bg-[#F6F7FB] border-[#E2E8F0] rounded-[10px] text-sm"
+              className="pl-9 h-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-800 rounded-[10px] text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
         <div className="px-2">
           <button
             onClick={() => setHistoryOpen(!historyOpen)}
-            className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-[#64748B] uppercase tracking-wide hover:bg-[#F6F7FB] rounded-[10px] transition-colors"
+            className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide hover:bg-slate-50 dark:hover:bg-slate-800 rounded-[10px] transition-colors"
           >
             <span>History</span>
             {historyOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -166,9 +166,9 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
         {historyOpen && (
           <div className="flex-1 overflow-y-auto px-2">
             {isLoading ? (
-              <div className="px-3 py-4 text-center text-sm text-[#64748B]">Loading...</div>
+              <div className="px-3 py-4 text-center text-sm text-slate-500 dark:text-slate-400">Loading...</div>
             ) : filteredChats.length === 0 ? (
-              <div className="px-3 py-4 text-center text-sm text-[#64748B]">
+              <div className="px-3 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
                 {searchQuery ? "No chats found" : "No chats yet"}
               </div>
             ) : (
@@ -180,7 +180,7 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
                   return (
                     <div
                       key={chat.id}
-                      className={`relative group ${activeChatId === chat.id ? 'bg-[#F6F7FB]' : ''} rounded-[10px]`}
+                      className={`relative group ${activeChatId === chat.id ? 'bg-slate-50 dark:bg-slate-800' : ''} rounded-[10px]`}
                       onMouseEnter={() => setHoveredChat(chat.id)}
                       onMouseLeave={() => setHoveredChat(null)}
                     >
@@ -201,13 +201,13 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
                       ) : (
                         <button
                           onClick={() => onChatSelect?.(chat)}
-                          className="w-full text-left px-3 py-2 hover:bg-[#F6F7FB] transition-colors rounded-[10px]"
+                          className="w-full text-left px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-[10px]"
                         >
                           <div className="flex items-start gap-2">
                             <TopicIcon className={`w-4 h-4 mt-0.5 shrink-0 ${topicColors[chat.topic]}`} />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-[#0F172A] truncate font-medium">{chat.title}</p>
-                              <p className="text-xs text-[#64748B] mt-0.5">
+                              <p className="text-sm text-slate-900 dark:text-white truncate font-medium">{chat.title}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                 {chat.last_message_at ? new Date(chat.last_message_at).toLocaleDateString() : 'New'}
                               </p>
                             </div>
@@ -218,18 +218,18 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
                                     e.stopPropagation();
                                     startEdit(chat);
                                   }}
-                                  className="p-1 hover:bg-[#E2E8F0] rounded-[10px] transition-colors"
+                                  className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-[10px] transition-colors"
                                 >
-                                  <Edit2 className="w-3.5 h-3.5 text-[#64748B]" />
+                                  <Edit2 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                                 </button>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleDelete(chat.id);
                                   }}
-                                  className="p-1 hover:bg-[#E2E8F0] rounded-[10px] transition-colors"
+                                  className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-[10px] transition-colors"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5 text-[#64748B]" />
+                                  <Trash2 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                                 </button>
                               </div>
                             )}
@@ -245,10 +245,10 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
         )}
 
         {/* Email Updates Campaign */}
-        <div className="px-4 py-4 border-t border-[#E2E8F0]">
-          <div className="bg-[#EFF6FF] dark:bg-[#1E3A8A] rounded-[12px] p-3 border border-[#2563EB]/10">
-            <h4 className="text-xs font-bold text-[#2563EB] dark:text-[#DBEAFE] uppercase tracking-wider mb-1">Stay Tuned</h4>
-            <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] mb-2 leading-relaxed">
+        <div className="px-4 py-4 border-t border-slate-200 dark:border-slate-800">
+          <div className="bg-blue-50 dark:bg-slate-800 rounded-[12px] p-3 border border-blue-100 dark:border-slate-700">
+            <h4 className="text-xs font-bold text-[#2563EB] dark:text-blue-400 uppercase tracking-wider mb-1">Stay Tuned</h4>
+            <p className="text-[10px] text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">
               Get the latest AI model updates delivered to your inbox.
             </p>
             <div className="space-y-2">
@@ -256,7 +256,7 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
                 placeholder="email@example.com"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
-                className="h-8 text-[11px] bg-white dark:bg-[#0F172A] border-[#E2E8F0] dark:border-[#334155] rounded-[6px]"
+                className="h-8 text-[11px] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-[6px] text-slate-900 dark:text-white"
               />
               <Button
                 size="sm"
@@ -270,26 +270,26 @@ export default function Sidebar({ activeChatId, onChatSelect, isOpen, onToggle }
         </div>
 
         {/* Bottom Navigation */}
-        <div className="border-t border-[#E2E8F0] p-2">
-          <Link
-            to={createPageUrl("Settings")}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] transition-colors ${isActive("/Settings")
-              ? "bg-[#F6F7FB] text-[#2563EB]"
-              : "text-[#64748B] hover:bg-[#F6F7FB]"
-              }`}
-          >
-            <Settings className="w-4 h-4" />
-            <span className="text-sm font-medium">Settings</span>
-          </Link>
+        <div className="border-t border-slate-200 dark:border-slate-800 p-2">
           <Link
             to={createPageUrl("UsageStats")}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] transition-colors ${isActive("/UsageStats")
-              ? "bg-[#F6F7FB] text-[#2563EB]"
-              : "text-[#64748B] hover:bg-[#F6F7FB]"
+              ? "bg-slate-50 dark:bg-slate-800 text-[#2563EB]"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
               }`}
           >
             <BarChart3 className="w-4 h-4" />
             <span className="text-sm font-medium">Usage Stats</span>
+          </Link>
+          <Link
+            to={createPageUrl("Settings")}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] transition-colors ${isActive("/Settings")
+              ? "bg-slate-50 dark:bg-slate-800 text-[#2563EB]"
+              : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+              }`}
+          >
+            <Settings className="w-4 h-4" />
+            <span className="text-sm font-medium">Settings</span>
           </Link>
         </div>
       </div>

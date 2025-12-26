@@ -36,7 +36,7 @@ export default function ChatInput({ onSend, isLoading }) {
               placeholder="What is on your mind?"
               disabled={isLoading}
               rows={1}
-              className="w-full px-3 md:px-4 py-2 md:py-3 bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#334155] rounded-[12px] resize-none text-sm text-[#0F172A] dark:text-[#F8FAFC] placeholder:text-[#64748B] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              className="w-full px-3 md:px-4 py-2 md:py-3 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-[#334155] rounded-[12px] resize-none text-sm text-slate-900 dark:text-[#F8FAFC] placeholder:text-slate-400 dark:placeholder:text-[#64748B] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               style={{
                 minHeight: "48px",
                 maxHeight: "300px",

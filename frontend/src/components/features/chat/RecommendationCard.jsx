@@ -16,35 +16,35 @@ export default function RecommendationCard({ recommendation, onUse, type = 'best
   const isBest = type === 'best';
 
   return (
-    <div className="bg-white dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-[#334155] rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow max-w-3xl mx-auto">
+    <div className="bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-[#334155] rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow max-w-3xl mx-auto">
       {/* Badge */}
-      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4 ${isBest ? "bg-[#EFF6FF] text-[#2563EB]" : "bg-purple-50 text-purple-600"
+      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4 ${isBest ? "bg-blue-50 dark:bg-blue-900/20 text-[#2563EB]" : "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400"
         }`}>
         <span>{isBest ? "🏆" : "✨"}</span>
         <span>{isBest ? "BEST MATCH" : "ALTERNATIVE"}</span>
       </div>
 
       {/* Model Name & Provider */}
-      <h3 className="text-xl md:text-2xl font-bold text-[#0F172A] mb-2">{recommendation.name}</h3>
-      <p className="text-sm text-[#64748B] mb-4">by {recommendation.provider}</p>
+      <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2">{recommendation.name}</h3>
+      <p className="text-sm text-slate-500 dark:text-[#64748B] mb-4">by {recommendation.provider}</p>
 
       {/* Reasoning */}
-      <p className="text-sm text-[#0F172A] leading-relaxed mb-4">
+      <p className="text-sm text-slate-700 dark:text-slate-100 leading-relaxed mb-4">
         {recommendation.reasoning}
       </p>
 
       {/* Metadata */}
       <div className="flex flex-wrap gap-3 mb-4">
         <div className="flex items-center gap-1.5 text-sm">
-          <Zap className="w-4 h-4 text-[#64748B]" />
-          <span className="text-[#0F172A]">{recommendation.speed}</span>
+          <Zap className="w-4 h-4 text-slate-400 dark:text-[#64748B]" />
+          <span className="text-slate-600 dark:text-slate-300">{recommendation.speed}</span>
         </div>
       </div>
 
       {/* Categories */}
       <div className="flex flex-wrap gap-2 mb-5">
         {recommendation.categories.map((cat) => (
-          <Badge key={cat} className={categoryColors[cat] || categoryColors.Auto}>
+          <Badge key={cat} className={`border-none ${categoryColors[cat] || categoryColors.Auto}`}>
             {cat}
           </Badge>
         ))}

@@ -24,16 +24,16 @@ export default function UserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-2 rounded-[10px] hover:bg-[#F6F7FB] transition-colors">
+      <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-2 rounded-[10px] hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
         <div className="w-8 h-8 rounded-full bg-[#2563EB] flex items-center justify-center text-sm font-medium text-white">
           {displayInitial}
         </div>
-        <ChevronDown className="w-4 h-4 text-[#64748B]" />
+        <ChevronDown className="w-4 h-4 text-slate-500 dark:text-slate-400" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 bg-white border-[#E2E8F0] rounded-[12px] shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
+      <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-[12px] shadow-lg">
         <div className="px-3 py-3 text-center">
-          <p className="text-sm font-medium text-[#0F172A] truncate px-2">{displayName}</p>
-          <p className="text-xs text-[#64748B] mt-1">Exploring OASIS</p>
+          <p className="text-sm font-medium text-slate-900 dark:text-white truncate px-2">{displayName}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Exploring OASIS</p>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

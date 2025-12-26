@@ -21,6 +21,7 @@ class ModelRecommendation(BaseModel):
     name: str
     provider: str
     reasoning: str
+    subtitle: Optional[str] = None
     input_price: float
     output_price: float
     speed: str

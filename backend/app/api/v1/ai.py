@@ -84,3 +84,29 @@ async def get_usage_stats(
     """
     logs = AILogsRepository.list(db=db, skip=skip, limit=limit, client_id=client_id)
     return logs
+
+@router.post("/monitor-context")
+async def monitor_context(request: dict):
+    """
+    Gemini Observer: Monitor chat context and suggest model switches.
+    
+    Request body:
+    {
+        "messages": [...],
+        "current_model": "GPT-4o"
+    }
+    
+    Returns:
+    {
+        "should_switch": true/false,
+        "suggested_model": "Model Name",
+        "provider": "Provider",
+        "reason": "Why switch",
+        "subtitle": "Role"
+    }
+    """
+    messages = request.get("messages", [])
+    current_model = request.get("current_model", "Unknown")
+    
+    result = AIService.monitor_chat_context(messages, current_model)
+    return result
