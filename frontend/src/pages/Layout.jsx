@@ -8,87 +8,8 @@ export default function Layout({ children }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Theme persistence
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    // Listen for theme changes from other windows/tabs or components
-    const handleStorageChange = (e) => {
-      if (e.key === "theme") {
-        if (e.newValue === "dark") document.documentElement.classList.add("dark");
-        else document.documentElement.classList.remove("dark");
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
   return (
     <div className="min-h-screen bg-[#F6F7FB] dark:bg-[#0F172A] transition-colors duration-300">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-          font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-        
-        ::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-          background: #F6F7FB;
-        }
-        
-        .dark ::-webkit-scrollbar-track {
-          background: #0F172A;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-          background: #E2E8F0;
-          border-radius: 4px;
-        }
-        
-        .dark ::-webkit-scrollbar-thumb {
-          background: #334155;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-          background: #CBD5E1;
-        }
-
-        .chat-container {
-          scroll-behavior: smooth;
-        }
-
-        /* Logo Inversion for Dark Mode - Fixed background box */
-        .dark .logo-invert {
-          filter: invert(1) brightness(1.5);
-          mix-blend-mode: screen;
-        }
-
-        @keyframes slideInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .animate-slide-in {
-          animation: slideInLeft 0.3s ease-out forwards;
-        }
-      `}</style>
-
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
         <Sidebar

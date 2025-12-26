@@ -1,8 +1,4 @@
-
-// Simple LocalStorage wrapper to replace Base44 backend
-
 import { apiClient } from './client';
-
 const STORAGE_KEY = 'oasis_chats';
 
 const getChats = () => {
@@ -10,61 +6,33 @@ const getChats = () => {
     return chats ? JSON.parse(chats) : [];
 };
 
-const saveChats = (chats) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
-};
-
-const getClientId = () => {
-    let clientId = localStorage.getItem('oasis_client_id');
-    if (!clientId) {
-        clientId = crypto.randomUUID();
-        localStorage.setItem('oasis_client_id', clientId);
-    }
-    return clientId;
-};
+const saveChats = (chats) => localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
 
 export const ChatService = {
     // Real Backend API
     analyzePrompt: async (prompt, userId = null) => {
-        const response = await apiClient.post('/ai/analyze-prompt', {
-            prompt,
-            user_id: userId,
-            client_id: getClientId()
-        });
-        return response.data;
+        const { data } = await apiClient.post('/ai/analyze-prompt', { prompt, user_id: userId });
+        return data;
     },
 
-    chat: async (message, modelName, history = []) => {
-        const response = await apiClient.post('/ai/chat', {
-            message,
-            model_name: modelName,
-            history,
-            client_id: getClientId()
-        });
-        return response.data;
+    chat: async (message, model_name, history = []) => {
+        const { data } = await apiClient.post('/ai/chat', { message, model_name, history });
+        return data;
     },
 
-    submitFeedback: async (feedbackData) => {
-        const response = await apiClient.post('/feedback/feedback', {
-            ...feedbackData,
-            client_id: getClientId()
-        });
-        return response.data;
+    submitFeedback: async (feedback) => {
+        const { data } = await apiClient.post('/feedback/feedback', feedback);
+        return data;
     },
 
     getUsage: async () => {
-        const response = await apiClient.get('/ai/usage', {
-            params: { client_id: getClientId() }
-        });
-        return response.data;
+        const { data } = await apiClient.get('/ai/usage');
+        return data;
     },
 
-    monitorContext: async (messages, currentModel) => {
-        const response = await apiClient.post('/ai/monitor-context', {
-            messages,
-            current_model: currentModel
-        });
-        return response.data;
+    monitorContext: async (messages, current_model) => {
+        const { data } = await apiClient.post('/ai/monitor-context', { messages, current_model });
+        return data;
     },
 
     // LocalStorage (History)

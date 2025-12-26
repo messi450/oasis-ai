@@ -4,29 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useTheme } from "next-themes";
 
 export default function Settings() {
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState({
     email: "user@example.com",
     emailNotifications: true,
     pushNotifications: false,
-    theme: document.documentElement.classList.contains("dark") ? "dark" : "light"
   });
 
   const [showSavedMessage, setShowSavedMessage] = useState(false);
 
-  React.useEffect(() => {
-    if (settings.theme === "dark") {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [settings.theme]);
-
   const handleSave = () => {
-    // Save settings logic
     setShowSavedMessage(true);
     setTimeout(() => setShowSavedMessage(false), 3000);
   };
@@ -123,8 +113,8 @@ export default function Settings() {
               </Label>
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => setSettings({ ...settings, theme: "light" })}
-                  className={`p-4 border-2 rounded-[12px] transition-all ${settings.theme === "light"
+                  onClick={() => setTheme("light")}
+                  className={`p-4 border-2 rounded-[12px] transition-all ${theme === "light"
                     ? "border-[#2563EB] bg-white"
                     : "border-slate-200 dark:border-slate-700 bg-white/10 hover:bg-white/20"
                     }`}
@@ -133,8 +123,8 @@ export default function Settings() {
                   <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Light</p>
                 </button>
                 <button
-                  onClick={() => setSettings({ ...settings, theme: "dark" })}
-                  className={`p-4 border-2 rounded-[12px] transition-all ${settings.theme === "dark"
+                  onClick={() => setTheme("dark")}
+                  className={`p-4 border-2 rounded-[12px] transition-all ${theme === "dark"
                     ? "border-[#2563EB] bg-slate-900"
                     : "border-slate-200 dark:border-slate-700 bg-slate-900/40 hover:bg-slate-900/60"
                     }`}

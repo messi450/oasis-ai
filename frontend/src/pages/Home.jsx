@@ -8,179 +8,76 @@ import { Loader2, Sparkles } from "lucide-react";
 import { ChatService } from "@/api/chatService";
 import { useQueryClient } from "@tanstack/react-query";
 
-const quickExamples = [
-  "Debug my Python code",
-  "Write a blog post about AI",
-  "Analyze sales data",
-  "Generate marketing copy"
-];
+const quickExamples = ["Debug my Python code", "Write a blog post about AI", "Analyze sales data", "Generate marketing copy"];
 
-const getCurrentTime = () => {
-  const now = new Date();
-  return now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-};
+const getTime = () => new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [activeModel, setActiveModel] = useState(null);
-  const [selectionStatus, setSelectionStatus] = useState(null); // "analyzing" | "selecting" | "complete"
-  const [suggestion, setSuggestion] = useState(null); // { should_switch, suggested_model, provider, reason, subtitle }
+  const [selectionStatus, setSelectionStatus] = useState(null);
+  const [suggestion, setSuggestion] = useState(null);
   const chatContainerRef = useRef(null);
   const queryClient = useQueryClient();
-
   const [searchParams, setSearchParams] = useSearchParams();
   const chatIdParam = searchParams.get('chatId');
 
   useEffect(() => {
-    if (chatIdParam) {
-      loadChat(chatIdParam);
-    } else {
-      // Reset for New Chat
-      setCurrentChatId(null);
-      setMessages([]);
-      setActiveModel(null);
-      setSuggestion(null);
-    }
+    if (chatIdParam) loadChat(chatIdParam);
+    else { setCurrentChatId(null); setMessages([]); setActiveModel(null); setSuggestion(null); }
   }, [chatIdParam]);
 
-  const loadChat = async (chatId) => {
-    try {
-      const chat = await ChatService.get(chatId);
-      if (chat) {
-        setCurrentChatId(chatId);
-        setMessages(chat.messages || []);
-      }
-    } catch (error) {
-      console.error('Failed to load chat:', error);
-    }
+  const loadChat = async (id) => {
+    const chat = await ChatService.get(id);
+    if (chat) { setCurrentChatId(id); setMessages(chat.messages || []); }
   };
 
-  const saveChat = async (newMessages) => {
-    try {
-      const chatData = {
-        title: newMessages[0]?.content?.slice(0, 50) || "New Chat",
-        topic: determineTopicFromPrompt(newMessages[0]?.content || ""),
-        messages: newMessages,
-        last_message_at: new Date().toISOString()
-      };
-
-      if (currentChatId) {
-        await ChatService.update(currentChatId, chatData);
-      } else {
-        const newChat = await ChatService.create(chatData);
-        setCurrentChatId(newChat.id);
-        setSearchParams({ chatId: newChat.id });
-      }
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
-    } catch (error) {
-      console.error('Failed to save chat:', error);
+  const saveChat = async (msgs) => {
+    const data = { title: msgs[0]?.content?.slice(0, 50) || "New Chat", messages: msgs, last_message_at: new Date().toISOString() };
+    if (currentChatId) await ChatService.update(currentChatId, data);
+    else {
+      const newChat = await ChatService.create(data);
+      setCurrentChatId(newChat.id);
+      setSearchParams({ chatId: newChat.id });
     }
-  };
-
-  const determineTopicFromPrompt = (prompt) => {
-    const lower = prompt.toLowerCase();
-    if (lower.includes('code') || lower.includes('debug') || lower.includes('program')) return 'code';
-    if (lower.includes('write') || lower.includes('blog') || lower.includes('content')) return 'writing';
-    if (lower.includes('analyze') || lower.includes('data') || lower.includes('research')) return 'analysis';
-    if (lower.includes('creative') || lower.includes('generate') || lower.includes('image')) return 'creative';
-    return 'general';
+    queryClient.invalidateQueries({ queryKey: ['chats'] });
   };
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
+    if (chatContainerRef.current) chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
   }, [messages, selectionStatus, suggestion]);
 
+  const addMessage = (content, type, extra = {}) => {
+    const msg = { id: Date.now() + Math.random(), content, type, timestamp: getTime(), role: type === 'user' ? 'user' : 'ai', ...extra };
+    setMessages(prev => [...prev, msg]);
+    return msg;
+  };
+
   const handleSendMessage = async (text) => {
-    const timestamp = getCurrentTime();
-
-    const userMessage = {
-      id: Date.now(),
-      type: 'user',
-      content: text,
-      timestamp,
-      role: 'user'
-    };
-
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    const updatedMessages = [...messages, addMessage(text, 'user')];
     setIsLoading(true);
     setSuggestion(null);
 
     try {
       if (activeModel) {
-        // Chat Mode
-        const data = await ChatService.chat(text, activeModel.name, messages);
-        const aiResponse = data.response;
-
-        const aiMessage = {
-          id: Date.now() + 1,
-          type: 'ai',
-          content: aiResponse,
-          timestamp: getCurrentTime(),
-          role: 'ai'
-        };
-
-        const finalMessages = [...updatedMessages, aiMessage];
-        setMessages(finalMessages);
+        const { response } = await ChatService.chat(text, activeModel.name, messages);
+        const finalMessages = [...updatedMessages, addMessage(response, 'ai')];
         saveChat(finalMessages);
-
-        // Silent Context Monitoring (Gemini Observer)
-        try {
-          const obsData = await ChatService.monitorContext(finalMessages, activeModel.name);
-          if (obsData && obsData.should_switch) {
-            setSuggestion(obsData);
-          }
-        } catch (obsError) {
-          console.error('Observer failed:', obsError);
-        }
+        const obs = await ChatService.monitorContext(finalMessages, activeModel.name);
+        if (obs?.should_switch) setSuggestion(obs);
       } else {
-        // Analysis Mode
         setSelectionStatus("analyzing");
-        await new Promise(resolve => setTimeout(resolve, 400));
+        const { recommendation, alternative } = await ChatService.analyzePrompt(text);
         setSelectionStatus("selecting");
-
-        const data = await ChatService.analyzePrompt(text);
-
-        if (!data || !data.recommendation) {
-          throw new Error("Invalid response from AI service");
-        }
-
-        const recommendation = data.recommendation;
-        const alternative = data.alternative;
-
-        await new Promise(resolve => setTimeout(resolve, 400));
-        setSelectionStatus("complete");
-
-        const aiMessage = {
-          id: Date.now() + 1,
-          type: 'ai',
-          content: recommendation.reasoning,
-          timestamp: getCurrentTime(),
-          recommendation: recommendation,
-          alternative: alternative,
-          role: 'ai',
-          autoSelected: true
-        };
-
-        const finalMessages = [...updatedMessages, aiMessage];
-        setMessages(finalMessages);
+        await new Promise(r => setTimeout(r, 400));
+        const finalMessages = [...updatedMessages, addMessage(recommendation.reasoning, 'ai', { recommendation, alternative, autoSelected: true })];
         saveChat(finalMessages);
         setActiveModel(recommendation);
       }
-    } catch (error) {
-      console.error('Failed to process message:', error);
-      const errorMessage = {
-        id: Date.now() + 1,
-        type: 'ai',
-        content: `Error: ${error.message || 'Unknown error'}. Details: ${JSON.stringify(error.response?.data || {})}`,
-        timestamp: getCurrentTime(),
-        role: 'ai'
-      };
-      setMessages([...updatedMessages, errorMessage]);
+    } catch (e) {
+      addMessage(`Error: ${e.message}`, 'ai');
     } finally {
       setIsLoading(false);
       setSelectionStatus(null);
@@ -190,16 +87,8 @@ export default function Home() {
   const handleUseModel = (model) => {
     setActiveModel(model);
     setSuggestion(null);
-    const systemMessage = {
-      id: Date.now(),
-      type: 'ai',
-      content: `🚀 Switched to ${model.name}. You are now chatting with this model.`,
-      timestamp: getCurrentTime(),
-      role: 'ai'
-    };
-    const updatedMessages = [...messages, systemMessage];
-    setMessages(updatedMessages);
-    saveChat(updatedMessages);
+    const msgs = [...messages, addMessage(`🚀 Switched to ${model.name}`, 'ai')];
+    saveChat(msgs);
   };
 
   const handleQuickExample = (example) => {

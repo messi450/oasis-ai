@@ -149,73 +149,49 @@ button:focus-visible {
 
 
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @layer base {
   * {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     @apply border-border outline-ring/50;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#F6F7FB] text-[#0F172A] dark:bg-[#0F172A] dark:text-[#F8FAFC] transition-colors duration-300;
   }
 }
 
-/* Base styles for both modes */
-body {
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* Scrollbar Styles */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #F6F7FB; }
+.dark ::-webkit-scrollbar-track { background: #0F172A; }
+::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+
+.chat-container { scroll-behavior: smooth; }
+
+/* Logo Inversion for Dark Mode */
+.dark .logo-invert {
+  filter: invert(1) brightness(1.5);
+  mix-blend-mode: screen;
 }
 
-/* Light Mode (Explicit) */
-:root:not(.dark) body,
-:root:not(.dark) .bg-\[\#F6F7FB\],
-:root:not(.dark) main {
-  background-color: #F6F7FB !important;
-  color: #0F172A;
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-:root:not(.dark) .bg-white {
-  background-color: #FFFFFF !important;
-}
+.animate-slide-in { animation: slideInLeft 0.3s ease-out forwards; }
 
-/* Custom Project Dark Mode Overrides */
-.dark body,
-.dark .bg-\[\#F6F7FB\],
-.dark main {
-  background-color: #0F172A !important;
-  color: #F8FAFC !important;
-}
-
-.dark .bg-white,
-.dark header,
-.dark aside,
-.dark .bg-white.border {
+/* Custom Overrides (cleaner implementation) */
+.dark .bg-white, .dark header, .dark aside, .dark .bg-white.border {
   background-color: #1E293B !important;
   border-color: #334155 !important;
 }
 
-.dark .text-\[\#0F172A\] {
-  color: #F8FAFC !important;
-}
-
-.dark .text-\[\#64748B\] {
-  color: #94A3B8 !important;
-}
-
-.dark .border-\[\#E2E8F0\] {
-  border-color: #334155 !important;
-}
-
-.dark .hover\:bg-\[\#F6F7FB\]:hover {
-  background-color: #2D3748 !important;
-}
-
-.dark .bg-\[\#EFF6FF\] {
-  background-color: #1E3A8A !important;
-  color: #DBEAFE !important;
-}
-
-.dark input,
-.dark textarea,
-.dark select {
+.dark input, .dark textarea, .dark select {
   background-color: #1E293B !important;
   color: #F8FAFC !important;
   border-color: #334155 !important;
