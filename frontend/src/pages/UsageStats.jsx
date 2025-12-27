@@ -170,10 +170,10 @@ export default function UsageStats() {
       <div className="max-w-6xl mx-auto p-4 md:p-8">
         {/* Header */}
         <div className="mb-6 md:mb-8">
-          <h1 className="text-xl md:text-2xl font-semibold text-[#0F172A] mb-2">
+          <h1 className="text-xl md:text-2xl font-semibold text-[#0F172A] dark:text-[#F8FAFC] mb-2">
             Usage Statistics
           </h1>
-          <p className="text-sm text-[#64748B]">
+          <p className="text-sm text-[#64748B] dark:text-[#94A3B8]">
             Real-time AI usage and performance metrics
           </p>
         </div>
@@ -185,11 +185,11 @@ export default function UsageStats() {
             return (
               <div
                 key={stat.title}
-                className="bg-white border border-[#E2E8F0] rounded-[12px] md:rounded-[16px] p-4 md:p-6"
+                className="bg-white dark:bg-[#1E293B]/50 border border-[#E2E8F0] dark:border-[#334155] rounded-[12px] md:rounded-[16px] p-4 md:p-6"
               >
                 <Icon className="w-4 h-4 md:w-5 md:h-5 mb-2 md:mb-3 text-[#2563EB]" />
-                <p className="text-xs md:text-sm text-[#64748B]">{stat.title}</p>
-                <p className="text-lg md:text-2xl font-semibold text-[#0F172A] mt-1">
+                <p className="text-xs md:text-sm text-[#64748B] dark:text-[#94A3B8]">{stat.title}</p>
+                <p className="text-lg md:text-2xl font-semibold text-[#0F172A] dark:text-[#F8FAFC] mt-1">
                   {stat.value}
                 </p>
               </div>
@@ -198,8 +198,8 @@ export default function UsageStats() {
         </div>
 
         {/* Usage Over Time - Visual Graph */}
-        <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-4 md:p-6 mb-6 md:mb-8">
-          <h2 className="text-base md:text-lg font-semibold mb-4">Usage Over Time</h2>
+        <div className="bg-white dark:bg-[#1E293B]/50 border border-[#E2E8F0] dark:border-[#334155] rounded-[16px] p-4 md:p-6 mb-6 md:mb-8">
+          <h2 className="text-base md:text-lg font-semibold mb-4 text-[#0F172A] dark:text-[#F8FAFC]">Usage Over Time</h2>
           <div className="h-48 md:h-64 flex items-end justify-between gap-1 md:gap-2">
             {usageByMonth.map((month, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-2">
@@ -215,23 +215,23 @@ export default function UsageStats() {
                     )}
                   </div>
                 </div>
-                <p className="text-[10px] md:text-xs text-[#64748B] font-medium">{month.name}</p>
+                <p className="text-[10px] md:text-xs text-[#64748B] dark:text-[#94A3B8] font-medium">{month.name}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Model Distribution */}
-        <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-4 md:p-6 mb-6 md:mb-8">
-          <h2 className="text-base md:text-lg font-semibold mb-4">Most Suggested Models</h2>
+        <div className="bg-white dark:bg-[#1E293B]/50 border border-[#E2E8F0] dark:border-[#334155] rounded-[16px] p-4 md:p-6 mb-6 md:mb-8">
+          <h2 className="text-base md:text-lg font-semibold mb-4 text-[#0F172A] dark:text-[#F8FAFC]">Most Suggested Models</h2>
           <div className="space-y-3">
             {modelUsage.slice(0, 5).map((model) => (
               <div key={model.name}>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="font-medium text-[#0F172A]">{model.name}</span>
-                  <span className="text-[#64748B]">{model.count} times ({model.percent}%)</span>
+                  <span className="font-medium text-[#0F172A] dark:text-[#F8FAFC]">{model.name}</span>
+                  <span className="text-[#64748B] dark:text-[#94A3B8]">{model.count} times ({model.percent}%)</span>
                 </div>
-                <div className="h-2 bg-[#F6F7FB] rounded-full overflow-hidden">
+                <div className="h-2 bg-[#F6F7FB] dark:bg-[#334155] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-[#2563EB] to-[#3B82F6] rounded-full transition-all"
                     style={{ width: `${model.percent}%` }}
@@ -246,12 +246,12 @@ export default function UsageStats() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white border border-[#E2E8F0] rounded-[16px] p-4 md:p-6">
-          <h2 className="text-base md:text-lg font-semibold mb-4">Recent Activity</h2>
+        <div className="bg-white dark:bg-[#1E293B]/50 border border-[#E2E8F0] dark:border-[#334155] rounded-[16px] p-4 md:p-6">
+          <h2 className="text-base md:text-lg font-semibold mb-4 text-[#0F172A] dark:text-[#F8FAFC]">Recent Activity</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#E2E8F0]">
+                <tr className="border-b border-[#E2E8F0] dark:border-[#334155]">
                   <th className="text-left py-2 px-2 text-[#64748B] font-medium">Model</th>
                   <th className="text-left py-2 px-2 text-[#64748B] font-medium hidden md:table-cell">Query</th>
                   <th className="text-left py-2 px-2 text-[#64748B] font-medium">Why Best</th>
@@ -259,10 +259,10 @@ export default function UsageStats() {
               </thead>
               <tbody>
                 {events.slice(0, 10).map((e) => (
-                  <tr key={e.id} className="border-b border-[#E2E8F0] hover:bg-[#F6F7FB]">
-                    <td className="py-3 px-2 font-medium text-[#0F172A]">{e.model}</td>
-                    <td className="py-3 px-2 text-[#64748B] hidden md:table-cell max-w-xs truncate">{e.query}</td>
-                    <td className="py-3 px-2 text-[#64748B] text-xs md:text-sm">{e.reason}</td>
+                  <tr key={e.id} className="border-b border-[#E2E8F0] dark:border-[#334155] hover:bg-[#F6F7FB] dark:hover:bg-[#334155]/20">
+                    <td className="py-3 px-2 font-medium text-[#0F172A] dark:text-[#F8FAFC]">{e.model}</td>
+                    <td className="py-3 px-2 text-[#64748B] dark:text-[#94A3B8] hidden md:table-cell max-w-xs truncate">{e.query}</td>
+                    <td className="py-3 px-2 text-[#64748B] dark:text-[#94A3B8] text-xs md:text-sm">{e.reason}</td>
                   </tr>
                 ))}
               </tbody>
